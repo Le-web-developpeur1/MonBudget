@@ -24,7 +24,7 @@ export default function AddTransactionScreen() {
   const [type, setType] = useState<'revenu' | 'depense'>('depense');
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
+  const [category] = useState('');
   const [error, setError] = useState('');
 
   // Charger le mode création ou le mode édition selon la provenance
@@ -33,6 +33,7 @@ export default function AddTransactionScreen() {
       // Mode Édition : on récupère les données de la transaction existante
       const txAModifier = transactions.find(t => t.id === params.editId);
       if (txAModifier) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setType(txAModifier.type);
         setAmount(txAModifier.amount.toString());
         setTitle(txAModifier.title);
@@ -41,7 +42,7 @@ export default function AddTransactionScreen() {
       // Mode Création : on récupère le type poussé par l'historique
       setType(params.initialType);
     }
-  }, [params.editId, params.initialType]);
+  }, [params.editId, params.initialType, transactions]);
 
   const handleSave = () => {
     const parsedAmount = parseFloat(amount.replace(/\s/g, ''));

@@ -8,7 +8,7 @@
     "scheme": "monbudget",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/images/icon.png"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,8 +31,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ],
-      "react-native-google-mobile-ads"
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -45,7 +44,7 @@
       },
       "react-native-google-mobile-ads": {
         "android_app_id": "ca-app-pub-7768106667453820~6590622719",
-        "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
+        "ios_app_id": "ca-app-pub-7768106667453820~8015312619"
       }
     }
   }

@@ -127,7 +127,7 @@ export default function ConnexionScreen() {
             onPress={() => router.push('/register')}
           >
             <Text style={styles.footerText}>
-              Pas encore de compte ? <Text style={styles.linkText}>S'inscrire</Text>
+              Pas encore de compte ? <Text style={styles.linkText}>S&apos;inscrire</Text>
             </Text>
           </TouchableOpacity>
 

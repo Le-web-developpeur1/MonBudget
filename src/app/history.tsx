@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -18,15 +18,11 @@ export default function HistoryScreen() {
   const params = useLocalSearchParams();
   
   // Onglet actif ('revenu' ou 'depense') hérité de l'accueil
-  const [activeTab, setActiveTab] = useState<'revenu' | 'depense'>('depense');
+  const [activeTab] = useState<'revenu' | 'depense'>(
+    (params.tab === 'revenu' || params.tab === 'depense') ? params.tab : 'depense'
+  );
   // Filtre temporel actif (Par défaut 'toutes' comme sur ta maquette)
   const [period, setPeriod] = useState<FilterPeriod>('toutes');
-
-  useEffect(() => {
-    if (params.tab === 'revenu' || params.tab === 'depense') {
-      setActiveTab(params.tab);
-    }
-  }, [params.tab]);
 
   const transactions = useBudgetStore((state) => state.transactions);
 

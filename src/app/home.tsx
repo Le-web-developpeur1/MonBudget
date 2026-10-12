@@ -17,11 +17,12 @@ let BannerAdSize: any = null;
 let TestIds: any = null;
 
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const GoogleAds = require('react-native-google-mobile-ads');
   BannerAd = GoogleAds.BannerAd;
   BannerAdSize = GoogleAds.BannerAdSize;
   TestIds = GoogleAds.TestIds;
-} catch (e) {
+} catch  {
   // Si on est sur Expo Go, le module plante mais l'application ignore l'erreur sans s'arrêter !
 }
 
@@ -76,7 +77,6 @@ export default function HomeScreen() {
                   </TouchableOpacity>
               </View>
               
-              {/* 🔴 SÉCURITÉ GLOBALE : La pub ne s'affiche que si l'application est compilée en natif (EAS Build) et que le module existe */}
               {!__DEV__ && BannerAd && (
                 <View style={styles.adContainer}>
                   <BannerAd
