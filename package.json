@@ -43,7 +43,6 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "eas-build-on-success": "bash inject-ads.sh"
   },
   "private": true
 }
