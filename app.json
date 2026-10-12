@@ -41,11 +41,11 @@
       "router": {},
       "eas": {
         "projectId": "15db8c99-8288-4e68-9478-dabfeb2221f8"
-      },
-      "react-native-google-mobile-ads": {
-        "android_app_id": "ca-app-pub-7768106667453820~6590622719",
-        "ios_app_id": "ca-app-pub-7768106667453820~8015312619"
       }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-7768106667453820~6590622719",
+    "ios_app_id": "ca-app-pub-7768106667453820~8015312619"
   }
 }
