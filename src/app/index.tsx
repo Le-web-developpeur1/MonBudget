@@ -1,98 +1,238 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState } from 'react';
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  TextInput, 
+  TouchableOpacity, 
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Image
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useBudgetStore } from '@/store/budgetStore';
+import { COLORS } from '@/theme/color';
+import { Ionicons } from '@expo/vector-icons';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+export default function ConnexionScreen() {
+  const router = useRouter();
+  const login = useBudgetStore((state) => state.login);
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+  // États pour gérer les champs et les erreurs
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [secureText, setSecureText] = useState(true);
+
+  const handleLogin = () => {
+    // Validation rapide des champs
+    if (!email || !password) {
+      setError('Veuillez remplir tous les champs.');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+
+    // Simulation d'une légère attente pour faire pro
+    setTimeout(() => {
+      const success = login(email.trim().toLowerCase(), password);
+      setLoading(false);
+
+      if (success) {
+        // Redirection vers l'écran d'accueil
+        router.replace('/home');
+      } else {
+        setError('Adresse e-mail ou mot de passe incorrect.');
+      }
+    }, 800);
+  };
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+      <KeyboardAvoidingView 
+        style={styles.container} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+          
+          {/* Section Logo / Titre */}
+          <View style={styles.logoContainer}>
+            <Image 
+              source={require('@/assets/images/icon.png')}
+              style={styles.mainLogo}
+              resizeMode='contain'
+            />
+          </View>
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+          {/* Section Formulaire */}
+          <View style={styles.formContainer}>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+            {/* Champ E-mail */}
+            <TextInput 
+              style={styles.input}
+              placeholder="Adresse e-mail"
+              placeholderTextColor={COLORS.textSecondary}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+            {/* Champ Mot de passe */}
+            <View style={styles.inputContainer}>
+              <TextInput 
+                style={styles.inputField}
+                placeholder="Mot de passe"
+                placeholderTextColor={COLORS.textSecondary}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={secureText}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <TouchableOpacity 
+                  style={styles.eyeButton} 
+                  onPress={() => setSecureText(!secureText)}
+                >
+                  <Ionicons 
+                    name={secureText ? "eye-off-outline" : "eye-outline"} 
+                    size={22} 
+                    color={COLORS.textSecondary} 
+                  />
+                </TouchableOpacity>
+            </View>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+            {/* Bouton de Connexion */}
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={handleLogin}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color={COLORS.textPrimary} />
+              ) : (
+                <Text style={styles.buttonText}>SE CONNECTER</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* Lien de redirection vers l'inscription */}
+          <TouchableOpacity 
+            style={styles.footerLink}
+            onPress={() => router.push('/register')}
+          >
+            <Text style={styles.footerText}>
+              Pas encore de compte ? <Text style={styles.linkText}>S'inscrire</Text>
+            </Text>
+          </TouchableOpacity>
+
+        </ScrollView>
+      </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
-    flexDirection: 'row',
+    paddingHorizontal: 24,
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
+  logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    marginBottom: 40,
+    marginTop: 20,
+    width: '100%',
   },
-  title: {
+  mainLogo: {
+    width: 100,      
+    height: 100,
+    borderRadius: 22, 
+  },
+  formContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: COLORS.danger,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 16,
     textAlign: 'center',
+    width: '100%',
   },
-  code: {
-    textTransform: 'uppercase',
+  input: {
+    width: '100%',
+    height: 56,
+    backgroundColor: COLORS.card,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: COLORS.textPrimary,
+    marginBottom: 16,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  button: {
+    width: '100%',
+    height: 56,
+    backgroundColor: COLORS.primary,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  buttonText: {
+    color: COLORS.textPrimary,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  footerLink: {
+    marginTop: 32,
+    alignItems: 'center',
+  },
+  footerText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  linkText: {
+    color: COLORS.primary,
+    fontWeight: '600',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    height: 56,
+    backgroundColor: COLORS.card,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  inputField: {
+    flex: 1,
+    height: '100%',
+    fontSize: 16,
+    color: COLORS.textPrimary,
+  },
+  eyeButton: {
+    padding: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  eyeText: {
+    fontSize: 18,
   },
 });

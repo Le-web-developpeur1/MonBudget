@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mon-budget",
+    "name": "MonBudget",
     "slug": "mon-budget",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,12 +12,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#0F172A",
+        "foregroundImage": "./assets/images/icon.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.booba_car_92i.monbudget"
     },
     "web": {
       "output": "static",
@@ -28,15 +27,25 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#0F172A",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
       ]
     ],
+    "react-native-google-mobile-ads": {
+      "android_app_id": "ca-app-pub-7768106667453820~6590622719",
+      "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
+    },
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "15db8c99-8288-4e68-9478-dabfeb2221f8"
+      }
     }
   }
 }
