@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -8,34 +8,101 @@ import {
   FlatList,
   Platform
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useBudgetStore, Transaction } from '@/store/budgetStore';
 import { COLORS } from '@/theme/color';
+import { getCategoryById } from '@/constants/categories';
+import { Ionicons } from '@expo/vector-icons';
 
-let BannerAd: any = null;
-let BannerAdSize: any = null;
+let InterstitialAd: any = null;
+let AdEventType: any = null;
 let TestIds: any = null;
 
 try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const GoogleAds = require('react-native-google-mobile-ads');
-  BannerAd = GoogleAds.BannerAd;
-  BannerAdSize = GoogleAds.BannerAdSize;
+  InterstitialAd = GoogleAds.InterstitialAd;
+  AdEventType = GoogleAds.AdEventType;
   TestIds = GoogleAds.TestIds;
 } catch  {
   // Si on est sur Expo Go, le module plante mais l'application ignore l'erreur sans s'arrêter !
 }
 
+//Controle de fréquence des pubs
+let lastAdTime = 0;
+const AD_INTERVAL = 5 * 60 * 1000;
+
 export default function HomeScreen() {
   const router = useRouter();
   
-  // Utilise TestIds.BANNER si l'outil existe, sinon met une chaîne vide temporaire pour Expo Go
-  const adUnitId = __DEV__ ? (TestIds?.BANNER || '') : 'ca-app-pub-7768106667453820/1338296037'; 
-
   const user = useBudgetStore((state) => state.currentUser);
   const solde = useBudgetStore((state) => state.solde);
   const transactions = useBudgetStore((state) => state.transactions);
   const logout = useBudgetStore((state) => state.logout);
+  const insets = useSafeAreaInsets();
+
+  //ID de l'Interstitial Ad
+  const ANDROID_INTERSTITIAL_ID = "ca-app-pub-7768106667453820/5203241625";
+  const IOS_INTERSTITIAL_ID = "ca-app-pub-7768106667453820/5578821154";
+
+  const InterstitialAdUnitId = __DEV__ 
+    ? (TestIds?.INTERSTITIAL ||'') 
+    : Platform.OS === "android" ? ANDROID_INTERSTITIAL_ID : IOS_INTERSTITIAL_ID;
+
+  const interstitialRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!InterstitialAd || !AdEventType) return;
+
+    const now = Date.now();
+    const timeSinceLastAd = now - lastAdTime;
+
+    //Vérifier si assez de temps s'est écoulé depuis la dernière pub
+    if (lastAdTime > 0 && timeSinceLastAd < AD_INTERVAL) {
+      const miniutesLeft = Math.ceil((AD_INTERVAL - timeSinceLastAd) / 60000);
+      console.log(`Trop tôt ! Prochaine pub dans ${miniutesLeft} minute(s)`);
+      return;
+    };
+
+    //Créer l'Interstitial Ad
+    const interstitial = InterstitialAd.createForAdRequest(InterstitialAdUnitId, {
+      resquestNonPersonalizedAdsOnly: true,
+    });
+
+    interstitialRef.current = interstitial;
+
+    //Écouter les événements
+    const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+      setTimeout(() => {
+        if (interstitialRef.current) {
+          interstitial.show();
+        }
+      }, 2000);
+    });
+
+    const unsubscribeOpened = interstitial.addAdEventListener(AdEventType.OPENED, () => {
+      console.log('Pub affichée');
+      lastAdTime = Date.now();
+      setTimeout(() => {
+        console.log("Juste 15 secondes")
+      }, 15000);
+    });
+
+    const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+      console.log('Pub fermée');
+    });
+
+    //Charger la pub
+    interstitial.load();
+
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeOpened();
+      unsubscribeClosed();
+    };
+
+  }, []);
 
   const totalEntrees = transactions
     .filter(t => t.type === 'revenu')
@@ -47,8 +114,26 @@ export default function HomeScreen() {
 
   const renderItem = ({ item }: { item: Transaction }) => {
     const isRevenu = item.type === 'revenu';
+    const category = getCategoryById(item.category);
+
     return (
       <View style={styles.transactionCard}>
+        <View style={{ 
+          width: 36, 
+          height: 36, 
+          right: 6,
+          borderRadius: 8, 
+          backgroundColor: isRevenu ? COLORS.primary + '20' : COLORS.danger + '20',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <Ionicons 
+            name={category?.icon as any || 'cash'} 
+            size={18} 
+            color={isRevenu ? COLORS.primary : COLORS.danger} 
+          />
+        </View>
+
         <View style={styles.transactionLeft}>
           <Text style={styles.transactionTitle}>{item.title}</Text>
           <Text style={styles.transactionDate}>{item.date}</Text>
@@ -64,7 +149,7 @@ export default function HomeScreen() {
   };
 
   return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container} edges={["bottom"]}>
           <View style={styles.card}>
               {/* Section En-tête / Profil */}
               <View style={styles.header}>
@@ -76,18 +161,6 @@ export default function HomeScreen() {
                       <Text style={styles.logoutText}>Quitter</Text>
                   </TouchableOpacity>
               </View>
-              
-              {!__DEV__ && BannerAd && (
-                <View style={styles.adContainer}>
-                  <BannerAd
-                      unitId={adUnitId}
-                      size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-                      requestOptions={{
-                        requestNonPersonalizedAdsOnly: true,
-                      }}
-                  />
-                </View>
-              )}
 
               {/* Section Carte de Solde Global */}
               <View style={styles.soldeCard}>
@@ -131,7 +204,7 @@ export default function HomeScreen() {
             )}
           </ScrollView>
 
-          <View style={styles.actionButtonContainer}>
+          <View style={[styles.actionButtonContainer, {paddingBottom: insets.bottom + 8 }]}>
               <TouchableOpacity
                   style={[styles.actionButton, { backgroundColor: COLORS.primary}]}
                   onPress={() => router.push({ pathname: '/history', params: {tab: "revenu"}})}
@@ -146,7 +219,7 @@ export default function HomeScreen() {
                   <Text style={styles.actionButtonText}>Dépense</Text>
               </TouchableOpacity>
           </View>
-      </View>
+      </SafeAreaView>
   );
 }
 
@@ -154,13 +227,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    paddingTop: Platform.OS === 'ios' ? 50 : 20, 
-  },
-  adContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    width: '100%',
+    paddingTop: Platform.OS === 'ios' ? 35 : 15, 
   },
   card: {
     paddingHorizontal: 20,
@@ -284,7 +351,7 @@ const styles = StyleSheet.create({
   },
   actionButtonContainer: {
     position: 'absolute',
-    bottom: 16,
+    bottom: 0,
     left: 20,
     right: 20,
     flexDirection: 'row',

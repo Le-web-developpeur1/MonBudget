@@ -12,6 +12,8 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useBudgetStore } from '@/store/budgetStore';
 import { COLORS } from '@/theme/color';
+import { getCategoryByType } from '@/constants/categories';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AddTransactionScreen() {
   const router = useRouter();
@@ -24,7 +26,7 @@ export default function AddTransactionScreen() {
   const [type, setType] = useState<'revenu' | 'depense'>('depense');
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
-  const [category] = useState('');
+  const [category, setCategory] = useState('');
   const [error, setError] = useState('');
 
   // Charger le mode création ou le mode édition selon la provenance
@@ -37,6 +39,7 @@ export default function AddTransactionScreen() {
         setType(txAModifier.type);
         setAmount(txAModifier.amount.toString());
         setTitle(txAModifier.title);
+        setCategory(txAModifier.category);
       }
     } else if (params.initialType === 'revenu' || params.initialType === 'depense') {
       // Mode Création : on récupère le type poussé par l'historique
@@ -56,13 +59,18 @@ export default function AddTransactionScreen() {
       return;
     }
 
+    if (!category) {
+      setError('Veuillez donnez une catégorie à cette transaction');
+      return;
+    }
+
     setError('');
-    const finalCategory = category.trim() || (type === 'revenu' ? 'Revenu Général' : 'Dépense Générale');
+
 
     if (params.editId) {
-      modifierTransaction(params.editId as string, title.trim(), parsedAmount, finalCategory);
+      modifierTransaction(params.editId as string, title.trim(), parsedAmount, category);
     } else {
-      ajouterTransaction(title.trim(), parsedAmount, type, finalCategory);
+      ajouterTransaction(title.trim(), parsedAmount, type, category);
     }
 
     // Retourne à l'historique calé sur le bon onglet
@@ -110,17 +118,32 @@ export default function AddTransactionScreen() {
         />
 
         {/* 3. CHAMP DE LA CATÉGORIE EN MODE MENU DÉROULANT SIMULÉ */}
-        {/* <View style={styles.dropdownInputContainer}>
-          <TextInput 
-            style={styles.dropdownInput}
-            placeholder="Choisir une catégorie"
-            placeholderTextColor={COLORS.textSecondary}
-            value={category}
-            onChangeText={setCategory}
-            autoCapitalize="words"
-          />
-          <Text style={styles.dropdownArrow}>v</Text>
-        </View> */}
+        <Text style={styles.label}>Catégorie</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryScroll}
+          contentContainerStyle={styles.categoryContainer}
+        >
+          {getCategoryByType(type).map((cat) => (
+            <TouchableOpacity
+              key={cat.id}
+              style={[
+                styles.categoryButton,
+                category === cat.id && styles.categoryButtonActive
+              ]}
+              onPress={() => setCategory(cat.id)}
+            >
+              <Ionicons name={cat.icon as any} size={22} color={category === cat.id ? COLORS.primary : COLORS.textSecondary} />
+              <Text style={[
+                styles.categoryText,
+                category === cat.id && styles.categoryTextActive
+              ]}>
+                {cat.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
         {/* 4. GROS BOUTON UNIQUE DYNAMIQUE */}
         <TouchableOpacity 
@@ -236,4 +259,45 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: 16,
   },
+  label: {
+  fontSize: 14,
+  color: COLORS.textSecondary,
+  marginBottom: 8,
+  fontWeight: '600',
+},
+categoryScroll: {
+  marginBottom: 20,
+},
+categoryContainer: {
+  gap: 12,
+  paddingRight: 20,
+},
+categoryButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
+  backgroundColor: COLORS.card,
+  paddingVertical: 12,
+  paddingHorizontal: 16,
+  borderRadius: 12,
+  borderWidth: 2,
+  borderColor: 'transparent',
+},
+categoryButtonActive: {
+  borderColor: COLORS.primary,
+  backgroundColor: COLORS.primary + '20',
+},
+categoryIcon: {
+  fontSize: 20,
+},
+categoryText: {
+  fontSize: 14,
+  color: COLORS.textSecondary,
+  fontWeight: '600',
+},
+categoryTextActive: {
+  color: COLORS.primary,
+  fontWeight: 'bold',
+},
+
 });

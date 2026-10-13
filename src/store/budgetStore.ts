@@ -8,7 +8,7 @@ export interface Transaction {
     title: string;
     amount: number;
     type: "revenu" | 'depense';
-    category?: string;
+    category: string;
     date: string;
 }
 

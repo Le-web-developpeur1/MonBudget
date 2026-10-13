@@ -10,6 +10,8 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useBudgetStore, Transaction } from '@/store/budgetStore';
 import { COLORS } from '@/theme/color';
+import { getCategoryById } from '@/constants/categories';
+import { Ionicons } from '@expo/vector-icons';
 
 type FilterPeriod = 'aujourdhui' | 'semaine' | 'mois' | 'toutes';
 
@@ -22,7 +24,7 @@ export default function HistoryScreen() {
     (params.tab === 'revenu' || params.tab === 'depense') ? params.tab : 'depense'
   );
   // Filtre temporel actif (Par défaut 'toutes' comme sur ta maquette)
-  const [period, setPeriod] = useState<FilterPeriod>('toutes');
+  const [period, setPeriod] = useState<FilterPeriod>('aujourdhui');
 
   const transactions = useBudgetStore((state) => state.transactions);
 
@@ -42,6 +44,7 @@ export default function HistoryScreen() {
 
     const renderItem = ({ item }: { item: Transaction }) => {
     const isRevenu = item.type === 'revenu';
+    const category = getCategoryById(item.category);
 
     const handleAction = () => {
       Alert.alert(
@@ -80,6 +83,22 @@ export default function HistoryScreen() {
     return (
       // On transforme le View de la carte en TouchableOpacity pour pouvoir cliquer dessus !
       <TouchableOpacity style={styles.transactionCard} onPress={handleAction}>
+        <View style={{ 
+          width: 36, 
+          height: 36,
+          right: 6,
+          borderRadius: 8, 
+          backgroundColor: isRevenu ? COLORS.primary + '20' : COLORS.danger + '20',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <Ionicons 
+            name={category?.icon as any || 'cash'} 
+            size={20} 
+            color={isRevenu ? COLORS.primary : COLORS.danger} 
+          />
+        </View>
+
         <View style={styles.transactionLeft}>
           <Text style={styles.transactionTitle}>{item.title}</Text>
           <Text style={styles.transactionDate}>{item.date}</Text>
@@ -162,7 +181,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    paddingTop: 35,
+    paddingTop: 18,
   },
   backButton: {
     paddingHorizontal: 20,
