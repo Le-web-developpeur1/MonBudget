@@ -67,7 +67,7 @@ export default function HomeScreen() {
 
     //Créer l'Interstitial Ad
     const interstitial = InterstitialAd.createForAdRequest(InterstitialAdUnitId, {
-      resquestNonPersonalizedAdsOnly: true,
+      requestNonPersonalizedAdsOnly: true,
     });
 
     interstitialRef.current = interstitial;
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    paddingTop: Platform.OS === 'ios' ? 35 : 15, 
+    paddingTop: Platform.OS === 'ios' ? 30 : 10, 
   },
   card: {
     paddingHorizontal: 20,

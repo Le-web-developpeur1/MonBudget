@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  FlatList, 
-  TouchableOpacity,
-  Alert
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useBudgetStore, Transaction } from '@/store/budgetStore';
-import { COLORS } from '@/theme/color';
 import { getCategoryById } from '@/constants/categories';
+import { Transaction, useBudgetStore } from '@/store/budgetStore';
+import { COLORS } from '@/theme/color';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useState } from 'react';
+import {
+  Alert,
+  FlatList,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type FilterPeriod = 'aujourdhui' | 'semaine' | 'mois' | 'toutes';
 
@@ -38,8 +40,31 @@ export default function HistoryScreen() {
   // 2. Filtrer ensuite par période (Simulé ici, extensible selon tes besoins réels)
   const filteredTransactions = typeFiltered.filter(t => {
     if (period === 'toutes') return true;
-    // Logique temporelle native à ajouter selon ton format de date
-    return true; 
+    
+    //Parser la date de la transaction
+    const [datePart] = t.date.split(',');
+    const  [jour, mois, annee] = datePart.split('/').map(Number);
+    const transactionDate = new Date(annee, mois - 1, jour);
+    transactionDate.setHours(0, 0, 0, 0);
+
+    //Date actuelle
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    //Calculer la difference en jours
+    const differenceMs = today.getTime() - transactionDate.getTime();
+    const differenceJours = Math.floor(differenceMs / (1000 * 60 * 60 *24));
+
+    switch(period) {
+      case 'aujourdhui':
+        return differenceJours === 0;
+      case 'semaine':
+        return differenceJours >= 0;
+      case 'mois':
+        return differenceJours >= 0 && differenceJours < 30;
+      default: 
+        return true;
+    }
   });
 
     const renderItem = ({ item }: { item: Transaction }) => {
@@ -115,7 +140,7 @@ export default function HistoryScreen() {
 
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Bouton Retour dissimulé ou discret */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/home')}>
         <Text style={styles.backButtonText}>← Retour</Text>
@@ -173,7 +198,7 @@ export default function HistoryScreen() {
           showsVerticalScrollIndicator={false}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -181,7 +206,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    paddingTop: 18,
+    paddingTop: Platform.OS === 'ios' ? 0 : 18,
   },
   backButton: {
     paddingHorizontal: 20,

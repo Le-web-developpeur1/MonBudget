@@ -145,18 +145,18 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
+    paddingTop: 40,
+    paddingBottom: 60,
   },
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 40,
-    marginTop: 20,
     width: '100%',
   },
   mainLogo: {
-    width: 100,      
-    height: 100,
-    borderRadius: 22, 
+    width: 150,      
+    height: 150,
+    borderRadius: 28, 
   },
   formContainer: {
     width: '100%',
