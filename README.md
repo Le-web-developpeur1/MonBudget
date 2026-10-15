@@ -1,56 +1,73 @@
-# Welcome to your Expo app 👋
+# 📱 MonBudget - Application Mobile de Gestion Financière
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**MonBudget** est une application mobile native et performante développée avec **React Native** et **Expo (SDK 57)**. Conçue avec une approche orientée expérience utilisateur (UI/UX) premium en mode sombre, elle permet aux utilisateurs de suivre leurs finances personnelles, de catégoriser leurs flux monétaires (Revenus & Dépenses) et de visualiser leur solde en temps réel en monnaie locale (Franc Guinéen - FG).
 
-## Get started
+L'application intègre une architecture moderne et une monétisation active via le SDK de publicité mobile de Google.
 
-1. Install dependencies
+---
 
+## ✨ Fonctionnalités Principales
+
+- 🔐 **Authentification Sécurisée** : Écrans de Connexion et d'Inscription épurés avec gestion des états utilisateurs.
+- 💰 **Suivi Budgétaire Dynamique** : Tableau de bord complet affichant le solde actuel, le total des entrées (Revenus) et le total des sorties (Dépenses) mis à jour instantanément.
+- 📊 **Historique des Transactions** : Liste des transactions récentes avec un système d'onglets pour filtrer et catégoriser les mouvements financiers.
+- 💵 **Calculs en Temps Réel** : Intégration de filtres algorithmiques pour le calcul automatique des flux financiers du mois.
+- 📢 **Monétisation Google AdMob** : Intégration native de bannières publicitaires adaptatives et sécurisées (`react-native-google-mobile-ads`) optimisées pour la Nouvelle Architecture d'Expo.
+- 🎨 **Design Premium Sourdine** : Interface utilisateur moderne et soignée en mode sombre, optimisée pour le confort visuel.
+
+---
+
+## 🛠️ Stack Technique
+
+- **Framework** : [React Native](https://reactnative.dev) & [Expo (SDK 57)](https://expo.dev)
+- **Navigation** : Expo Router (Navigation basée sur le système de fichiers)
+- **Gestion d'État (State Management)** : [Zustand](https://github.com) (Magasin d'état persistant, global et ultra-rapide)
+- **Composants Natifs** : React Native Safe Area Context, Gesture Handler, Reanimated 4, Vector Icons
+- **Monétisation** : Google AdMob SDK (Bannières adaptatives de production)
+- **Langage** : TypeScript (Typage statique sécurisé)
+
+---
+
+## 🚀 Installation et Développement Local
+
+### Prérequis
+Assurez-vous d'avoir installé [Node.js](https://nodejs.org), le CLI d'Expo et les outils de développement Android (Android SDK / Java JDK).
+
+1. **Cloner le projet**
+   ```bash
+   git clone git@github.com:Le-web-developpeur1/MonBudget.git
+   cd mon-budget
+   ```
+
+2. **Installer les dépendances**
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. **Lancer l'environnement de développement (Expo Go)**
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+4. **Compiler l'application en mode natif (Android Debug)**
+   ```bash
+   npx expo run:android
+   ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 📦 Déploiement et Production (EAS Build)
 
-## Get a fresh project
+L'application est configurée pour utiliser **EAS (Expo Application Services)** afin de générer des builds de production optimisés et signés dans le cloud.
 
-When you're ready, run:
-
+Pour générer un fichier APK d'installation autonome, la configuration utilise le profil d'environnement crypté d'EAS :
 ```bash
-npm run reset-project
+eas build --platform android --profile preview
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-### Other setup steps
+## 👤 Développeur
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- **Boubacar Bah** - *Développeur Web & Mobile React Native / TypeScript Freelance*
+- Portfolio : https://boubacarbah-portfolio.vercel.app/
